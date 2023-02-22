@@ -1,6 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="mode.dart" type="FlutterRunConfigurationType" factoryName="Flutter" editBeforeRun="true">
-    <option name="filePath" value="$PROJECT_DIR$/workout_app-main/lib/main.dart" />
-    <method v="2" />
-  </configuration>
-</component>
