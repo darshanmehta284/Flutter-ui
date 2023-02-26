@@ -1,6 +1,35 @@
+import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:myscreen/Post.dart';
 
-class SecondScreen extends StatelessWidget {
+//
+Future<List<Post>> fetchPost() async {
+  final response =
+      await http.get(Uri.parse('https://63f620f359c944921f6d9d6d.mockapi.io/gym'));
+  if (response.statusCode == 200) {
+    final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
+    return parsed.map<Post>((json) => Post.fromMap(json)).toList();
+  } else {
+    throw Exception('Failed to load album');
+  }
+}
+
+class SecondScreen extends StatefulWidget {
+  @override
+  _SecondScreenState createState() => _SecondScreenState();
+}
+
+class _SecondScreenState extends State<SecondScreen> {
+  late Future<List<Post>> futurePost;
+
+  @override
+  void initState() {
+    super.initState();
+    futurePost = fetchPost();
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -35,7 +64,8 @@ class SecondScreen extends StatelessWidget {
                   margin: EdgeInsets.only(left: 210.00, top: 6.00),
                   child: CircleAvatar(
                     radius: 20, // Set the desired radius of the circle
-                    backgroundImage: AssetImage('assets/images/emely.jpg'), // Set the image
+                    backgroundImage:
+                        AssetImage('assets/images/emely.jpg'), // Set the image
                   ),
                 ),
               ],
@@ -48,10 +78,13 @@ class SecondScreen extends StatelessWidget {
               color: Color(0xff330D56F),
               borderRadius: BorderRadius.circular(50),
             ),
-            child: Icon(Icons.play_arrow_sharp, color: Colors.white,),
+            child: Icon(
+              Icons.play_arrow_sharp,
+              color: Colors.white,
+            ),
           ),
           Container(
-            margin: EdgeInsets.fromLTRB(20,400,20,0),
+            margin: EdgeInsets.fromLTRB(20, 400, 20, 0),
             child: Row(
               children: [
                 Row(
@@ -74,18 +107,20 @@ class SecondScreen extends StatelessWidget {
                     Icons.filter_alt_rounded,
                     color: Colors.white,
                     size: 24,
-
                   ),
                 )
               ],
             ),
           ),
           Container(
-            margin: EdgeInsets.fromLTRB(20,450,20,0),
+            margin: EdgeInsets.fromLTRB(20, 450, 20, 0),
             child: TextField(
               style: TextStyle(color: Color(0xffC2C2C2)),
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search, color: Colors.white,),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
                 filled: true,
                 fillColor: Color(0xff232441),
                 border: OutlineInputBorder(
@@ -97,35 +132,65 @@ class SecondScreen extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.fromLTRB(20,530,20,0),
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                Container(
-                  width: 140.0,
-                  child: Text("Popular", style: TextStyle(color: Colors.white),),
-                ),
-                Container(
-                  width: 140.0,
-                  child: Text("Hard Workout", style: TextStyle(color: Colors.white)),
-                ),
-                Container(
-                  width: 140.0,
-                  child: Text("Full Body", style: TextStyle(color: Colors.white)),
-                ),
-                Container(
-                  width: 140.0,
-                  child: Text("Crossfit", style: TextStyle(color: Colors.white)),
-                ),
-              ],
+              margin: EdgeInsets.fromLTRB(20, 530, 20, 0),
+              child: FutureBuilder<List<Post>>(
+                  future: futurePost,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Container(
+                        child: ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (_, index) => Container(
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: <Widget>[
+                                Container(
+                                  width: 140.0,
+                                  child: Text(
+                                    "${snapshot.data![index].category}",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }else {
+                      return Container(child: Text("No data", style: TextStyle(color: Colors.white),));
+                    }
+                  })
+              // ListView(
+              //   scrollDirection: Axis.horizontal,
+              //   children: <Widget>[
+              //     Container(
+              //       width: 140.0,
+              //       child: Text("Popular", style: TextStyle(color: Colors.white),),
+              //     ),
+              //     Container(
+              //       width: 140.0,
+              //       child: Text("Hard Workout", style: TextStyle(color: Colors.white)),
+              //     ),
+              //     Container(
+              //       width: 140.0,
+              //       child: Text("Full Body", style: TextStyle(color: Colors.white)),
+              //     ),
+              //     Container(
+              //       width: 140.0,
+              //       child: Text("Crossfit", style: TextStyle(color: Colors.white)),
+              //     ),
+              //   ],
+              // ),
+              ),
+          Container(
+            margin: EdgeInsets.fromLTRB(20, 585, 20, 0),
+            child: Text(
+              "Popular Workout",
+              style: TextStyle(fontSize: 23, color: Colors.white),
             ),
           ),
           Container(
-            margin: EdgeInsets.fromLTRB(20,585,20,0),
-            child: Text("Popular Workout", style: TextStyle(fontSize: 23, color: Colors.white),),
-          ),
-          Container(
-            margin: EdgeInsets.fromLTRB(20,625,20,30),
+            margin: EdgeInsets.fromLTRB(20, 625, 20, 30),
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: <Widget>[
@@ -157,8 +222,7 @@ class SecondScreen extends StatelessWidget {
                   ),
                 ),
               ],
-            )
-            ,
+            ),
           )
         ],
       ),
