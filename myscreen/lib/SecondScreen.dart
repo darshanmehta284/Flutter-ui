@@ -10,6 +10,7 @@ Future<List<Post>> fetchPost() async {
       await http.get(Uri.parse('https://63f620f359c944921f6d9d6d.mockapi.io/gym'));
   if (response.statusCode == 200) {
     final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
+
     return parsed.map<Post>((json) => Post.fromMap(json)).toList();
   } else {
     throw Exception('Failed to load album');
@@ -137,26 +138,23 @@ class _SecondScreenState extends State<SecondScreen> {
                   future: futurePost,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      print(snapshot.data);
                       return Container(
+                        height: 50,
                         child: ListView.builder(
                           itemCount: snapshot.data!.length,
+                          scrollDirection: Axis.horizontal,
                           itemBuilder: (_, index) => Container(
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: <Widget>[
-                                Container(
-                                  width: 140.0,
-                                  child: Text(
-                                    "${snapshot.data![index].category}",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ],
+                            width: 140.0,
+                            child: Text(
+                              "${snapshot.data![index].category}",
+                              style: TextStyle(color: Colors.white),
                             ),
                           ),
                         ),
                       );
-                    }else {
+                    }
+                    else {
                       return Container(child: Text("No data", style: TextStyle(color: Colors.white),));
                     }
                   })
